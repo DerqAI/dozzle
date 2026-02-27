@@ -2,11 +2,7 @@
   <nav class="border-base-content/20 bg-base-200 pt-safe fixed top-0 z-10 w-full border-b" data-testid="navigation">
     <div class="p-2">
       <div class="flex items-center">
-        <router-link :to="{ name: '/' }">
-          <Logo class="h-10" />
-        </router-link>
-
-        <div class="ml-auto flex items-center gap-2">
+        <div class="flex items-center gap-2">
           <a class="btn btn-circle flex" @click="$emit('search')" :title="$t('tooltip.search')">
             <mdi:magnify class="size-5" />
           </a>
@@ -28,7 +24,6 @@
 </template>
 
 <script lang="ts" setup>
-import Logo from "@/logo.svg";
 const route = useRoute();
 
 const show = ref(false);
