@@ -73,13 +73,18 @@ setup_directories() {
     echo "✓ Data directory ready"
 }
 
+# Returns the correct compose command string
+get_compose_cmd() {
+    if docker compose version &> /dev/null; then
+        echo "docker compose"
+    else
+        echo "docker-compose"
+    fi
+}
+
 # Use docker compose (v2) or docker-compose (v1)
 docker_compose_cmd() {
-    if docker compose version &> /dev/null; then
-        docker compose "$@"
-    else
-        docker-compose "$@"
-    fi
+    $(get_compose_cmd) "$@"
 }
 
 # Build and start containers
@@ -125,17 +130,19 @@ show_success() {
     echo "📊 Container Status:"
     docker_compose_cmd -f docker-compose.prod.yml ps
     echo ""
+    local compose_cmd
+    compose_cmd="$(get_compose_cmd)"
     echo "Useful commands:"
-    echo "  - View logs:    docker-compose -f docker-compose.prod.yml logs -f"
-    echo "  - Stop:         docker-compose -f docker-compose.prod.yml down"
-    echo "  - Restart:      docker-compose -f docker-compose.prod.yml restart"
+    echo "  - View logs:    ${compose_cmd} -f docker-compose.prod.yml logs -f"
+    echo "  - Stop:         ${compose_cmd} -f docker-compose.prod.yml down"
+    echo "  - Restart:      ${compose_cmd} -f docker-compose.prod.yml restart"
 }
 
 # Show failure message
 show_failure() {
     echo ""
     echo "❌ Health check failed. Check logs:"
-    echo "  docker-compose -f docker-compose.prod.yml logs dozzle"
+    echo "  $(get_compose_cmd) -f docker-compose.prod.yml logs dozzle"
     exit 1
 }
 
