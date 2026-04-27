@@ -82,26 +82,6 @@ start_services() {
     compose_prod up -d --build
 }
 
-# Wait for health check
-wait_for_healthy() {
-    echo "Waiting for application to start..."
-    
-    local max_retries=12
-    local retry_count=0
-    
-    while [ $retry_count -lt $max_retries ]; do
-        if compose_prod exec -T dozzle /dozzle healthcheck > /dev/null 2>&1; then
-            return 0
-        fi
-        
-        retry_count=$((retry_count + 1))
-        echo "  Waiting for Dozzle to be ready... (attempt $retry_count/$max_retries)"
-        sleep 5
-    done
-    
-    return 1
-}
-
 # Show success message
 show_success() {
     # Load environment for port/base
@@ -124,14 +104,6 @@ show_success() {
     echo "  - Restart:      docker compose -f docker-compose.prod.yml restart"
 }
 
-# Show failure message
-show_failure() {
-    echo ""
-    echo "❌ Health check failed. Check logs:"
-    echo "  docker compose -f docker-compose.prod.yml logs dozzle"
-    exit 1
-}
-
 # Main execution
 main() {
     check_dependencies
@@ -140,12 +112,7 @@ main() {
     setup_directories
     echo ""
     start_services
-    
-    if wait_for_healthy; then
-        show_success
-    else
-        show_failure
-    fi
+    show_success
 }
 
 main
